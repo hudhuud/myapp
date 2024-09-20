@@ -24,21 +24,39 @@ const TaskList = () => {
         }
     };
 
+    // Обновление состояния задачи (выполнено/не выполнено)
+    const toggleTaskCompletion = (taskId, completed) => {
+        axios.put(`http://localhost:5000/tasks/${taskId}`, { completed: !completed })
+            .then(res => {
+                setTasks(tasks.map(task =>
+                    task._id === taskId ? { ...task, completed: !completed } : task
+                ));
+            })
+            .catch(err => console.error(err));
+    };
+
     return (
         <div>
             <h1>Task List</h1>
-            <input
-                type="text"
-                value={newTask}
-                onChange={(e) => setNewTask(e.target.value)}
-                placeholder="Add new task"
-            />
-            <button onClick={addTask}>Add Task</button>
+            <div>
+                <input
+                    type="text"
+                    value={newTask}
+                    onChange={(e) => setNewTask(e.target.value)}
+                    placeholder="Add new task"
+                />
+                <button onClick={addTask}>Add Task</button>
+            </div>
 
             <ul>
                 {tasks.map(task => (
                     <li key={task._id}>
-                        {task.name} - {task.completed ? "Completed" : "Not completed"}
+                        <span className={task.completed ? 'completed' : ''}>
+                            {task.name}
+                        </span>
+                        <button onClick={() => toggleTaskCompletion(task._id, task.completed)}>
+                            {task.completed ? 'Undo' : 'Complete'}
+                        </button>
                     </li>
                 ))}
             </ul>
