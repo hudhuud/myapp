@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const taskRoutes = require('./routes/taskRoutes');
 
 const app = express();
 
@@ -17,30 +18,14 @@ db.once('open', function() {
     console.log('Подключено к базе данных MongoDB');
 });
 
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// Модель данных списка задач
-const TaskSchema = new mongoose.Schema({
-    name: String,
-    completed: Boolean
-});
+// Использование маршрутов
+app.use('/tasks', taskRoutes);
 
-const Task = mongoose.model('Task', TaskSchema);
-
-// Маршрут для получения всех задач
-app.get('/tasks', async (req, res) => {
-    const tasks = await Task.find({});
-    res.json(tasks);
-});
-
-// Маршрут для добавления новой задачи
-app.post('/tasks', async (req, res) => {
-    const newTask = new Task(req.body);
-    await newTask.save();
-    res.json(newTask);
-});
-
+// Запуск сервера
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Сервер запущен на порту ${PORT}`);
